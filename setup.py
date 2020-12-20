@@ -7,12 +7,11 @@ with open("README.md", "r") as fh:
 
 setup(
     name='mie_dust',
-    version='0.1dev1',
-    author='Everett Schlawin, Kayli Glidic',
-    packages=['tshirt','tshirt.pipeline',
-              'tshirt.pipeline.instrument_specific'],
-    url="https://github.com/eas342/tshirt",
-    description="A package to analyze time series data, especially for exoplanets",
+    version='0.1.dev1',
+    author='Everett Schlawin',
+    packages=['mie_dust'],
+    url="https://github.com/eas342/mie_dust",
+    description="A package to evaluate dust coefficients for a variety of compositions",
     include_package_data=True,
     install_requires=[
         "numpy>=1.15",

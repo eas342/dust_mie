@@ -18,6 +18,7 @@ setup(
         "numpy>=1.15",
         "scipy>=1.1.0",
         "astropy>=2.0",
+        "joblib",
         "miepython",
     ],
     long_description=long_description,

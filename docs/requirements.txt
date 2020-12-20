@@ -1,0 +1,7 @@
+nbsphinx
+astropy
+matplotlib
+numpy
+scipy
+sphinx-rtd-theme
+tqdm

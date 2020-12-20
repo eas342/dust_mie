@@ -1,0 +1,9 @@
+*~
+*.DS_Store
+*.pyc
+*.pdf
+*.png
+*.ipynb_checkpoints*
+docs/_build/
+build/
+dist/

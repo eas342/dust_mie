@@ -6,10 +6,10 @@ with open("README.md", "r") as fh:
     long_description = "".join(fh.readlines()[0:])
 
 setup(
-    name='mie_dust',
+    name='dust_mie',
     version='0.1.dev1',
     author='Everett Schlawin',
-    packages=['mie_dust'],
+    packages=['dust_mie'],
     url="https://github.com/eas342/mie_dust",
     description="A package to evaluate dust coefficients for a variety of compositions",
     include_package_data=True,

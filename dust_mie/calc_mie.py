@@ -112,6 +112,19 @@ def get_mie_coeff(wav,r=0.1,material='Fe2SiO4'):
         Radii of the particles in microns
     material: str
         Name of the material to look up
+    
+    
+    Returns
+    --------
+    qext: numpy array
+        Extinction cross section coefficient
+    qsca: numpy array
+        Scattering cross section coefficient
+    qback: numpy array
+        Back-scattering cross section coefficient
+    g: numpy array
+        the average cosine of the scattering phase function
+    
     """
     
     x = 2. * np.pi * np.array(r)/np.array(wav)
@@ -126,66 +139,85 @@ def reshape_dotprod(mieResult,npoint,nwav,weights):
     mieResult2D = np.reshape(mieResult,(npoint,nwav))
     return np.dot(weights,mieResult2D)
 
-def q_ext_lognorm_full(wavel,rad=1.0,n=complex(1.825,-1e-4),logNorm=False,
-                  npoint=128,pdfThreshold=0.001,s=0.5):
+def get_mie_coeff_distribution(wav,r=0.1,material='Fe2SiO4',s=0.5,
+                               npoint=128,pdfThreshold=0.001):
     """
-    Calculates the Mie extinction cross section Q_ext as a function of wavelength
+    Return the Mie coefficients for a given radius distribution and wavelength
+    Assumes homogeneous spherical particles and logNormal distribution
     
-    Arguments
-    ------------------
-    rad: float
-        The radius of the particle
-    wavel: float,arr
-        The array of wavelengths to evaluate
+    Parameters
+    ----------
+    wav: float or numpy array
+        Wavelength in microns to evaluate
+    r: float or numpy array
+        Radii of the particles in microns
+    material: str
+        Name of the material to look up
+    s: float
+        Log normal sigma parameter
+    npoint: int
+        Number of points to evaluate in distribution
+    pdfThreshold: float
+        The probability distribution extrema to evaluate
+    
+    Returns
+    --------
+    qext: numpy array
+        Average Extinction cross section coefficient
+    qsca: numpy array
+        Average Scattering cross section coefficient
+    qback: numpy array
+        Average Back-scattering cross section coefficient
+    g: numpy array
+        the average cosine of the scattering phase function
+    
     """
-    sz = 2. * np.pi * rad/np.array(wavel)
+
+
+    sz = 2. * np.pi * r/np.array(wav)
+    k, n = get_index_refrac(wav,material=material)
     
-    if logNorm == True:
-        ## Generate an array of points along the distribution
-        ## Size multiplier
-        nwav = sz.size
-        ## Size to evaluate lognormal weights
-        ## Make a linear space from threshold to threshold in the PDF
-        lowEval, highEval = invLognorm(s,rad,pdfThreshold)
-        
-        sizeEvalExtra = np.logspace(np.log(lowEval),np.log(highEval),base=np.e,num=(npoint+1))
-        sizeEval = sizeEvalExtra[0:-1] ## extra point is for differentials
-        dSize = np.diff(sizeEvalExtra)
-        
-        weights = lognorm(sizeEval,s,rad) * dSize
-        sumWeights = np.sum(weights)
-        if (sumWeights < 0.8) | (sumWeights > 1.1):
-            print(r'!!!!!!Warning, PDF weights not properly sampling PDF!!!!')
-            pdb.set_trace()
-        weights = weights / sumWeights
-        ## Arrange the array into 2D for multiplication of the grids
-        sizeMult = (np.tile(sizeEval/rad,(nwav,1))).transpose()
-        sizeArr = np.tile(sz,(npoint,1))
-        
-        eval2D = sizeMult * sizeArr
-        finalEval = eval2D.ravel() ## Evaluate a 1D array
-        
-        n_2d = np.tile(n,(npoint,1))
-        final_n = n_2d.ravel()
-    else:
-        finalEval = np.array(sz)
-        final_n = n
+    ## Generate an array of points along the distribution
+    ## Size multiplier
+    nwav = np.array(wav).size
+    ## Size to evaluate lognormal weights
+    ## Make a linear space from threshold to threshold in the PDF
+    lowEval, highEval = invLognorm(s,r,pdfThreshold)
+    
+    sizeEvalExtra = np.logspace(np.log(lowEval),np.log(highEval),base=np.e,num=(npoint+1))
+    sizeEval = sizeEvalExtra[0:-1] ## extra point is for differentials
+    dSize = np.diff(sizeEvalExtra)
+    
+    weights = lognorm(sizeEval,s,r) * dSize
+    sumWeights = np.sum(weights)
+    if (sumWeights < 0.8) | (sumWeights > 1.1):
+        print(r'!!!!!!Warning, PDF weights not properly sampling PDF!!!!')
+        pdb.set_trace()
+    weights = weights / sumWeights
+    ## Arrange the array into 2D for multiplication of the grids
+    sizeMult = (np.tile(sizeEval/r,(nwav,1))).transpose()
+    sizeArr = np.tile(sz,(npoint,1))
+    
+    eval2D = sizeMult * sizeArr
+    x = eval2D.ravel() ## Evaluate a 1D array
+    
+    n_2d = np.tile(n,(npoint,1))
+    final_n = n_2d.ravel()
+    k_2d = np.tile(k,(npoint,1))
+    final_k = k_2d.ravel()
     
     ## Make all points with sz > 100. the same as 100
     ## Otherwise the miescatter code quits without any warning or diagnostics
-    highp = finalEval > 100.
-    finalEval[highp] = 100.
+    highp = x > 100.
+    x[highp] = 100.
     
-    qext, qsca, qback, g = miepython.mie(final_n,finalEval)
+    qext, qsca, qback, g = all_opt_coeff_full(x, final_k, final_n)
     
-    if logNorm == True:
-        ## Now sum by the weights
-        finalQext = reshape_dotprod(qext,npoint,nwav,weights)
-        final_qscat = reshape_dotprod(qsca,npoint,nwav,weights)
-        final_qback = reshape_dotprod(qback,npoint,nwav,weights)
-        final_g = reshape_dotprod(g,npoint,nwav,weights)
-    else:
-        finalQext = qext
+    ## Now sum by the weights
+    finalQext = reshape_dotprod(qext,npoint,nwav,weights)
+    final_qscat = reshape_dotprod(qsca,npoint,nwav,weights)
+    final_qback = reshape_dotprod(qback,npoint,nwav,weights)
+    final_g = reshape_dotprod(g,npoint,nwav,weights)
         
     return finalQext, final_qscat, final_qback, final_g
 

@@ -1,11 +1,5 @@
-Welcome to ::code::`dust_mide`'s documentation!
-==================================
-
-.. image:: images/t_shirt_logo.jpg
-   :width: 200px
-   :alt: T shirt logo
-   :align: center
-
+Welcome to ::code::`dust_mie`'s documentation!
+===============================================
 
 :code:`mie_dust` is a simple wrapper for :code:`miescatter`.
 
@@ -16,6 +10,8 @@ The raw code is accessible at https://github.com/eas342/dust_mie
    :caption: Contents:
    
    installation
+   
+   dust_database
    
 .. toctree::
    :maxdepth: 2

@@ -11,16 +11,12 @@ from astropy.io import fits, ascii
 from astropy.table import Table 
 from scipy.interpolate import interp1d
 import pkg_resources
+import yaml
 
 
+dustDictFile = pkg_resources.resource_filename('dust_mie','optical_dat/dust_dict.yaml')
+labelDict = yaml.safe_load(open(dustDictFile))
 
-labelDict = {"Mg2SiO4": "Mg$_2$SiO$_4$ (Forsterite)",
-             "SiO2": "SiO$_2$ (quartz)",
-             "Fe2SiO4":"Fe$_2$SiO$_4$ (fayalite)",
-             "Fe":"Fe (Metallic Iron)",
-             "MgSiO3":"MgSiO$_3$ (enstatite)",
-             "Al2O3":"Al$_2$O$_3$ (corundum)",
-             "C":"C (Carbon)"}
 # Analytic Approximation
 # def q_absorb(x, n_i, n_r):
 #     num = 24*x*n_r*n_i
@@ -172,6 +168,13 @@ def get_index_refrac(wav,material='Fe2SiO4'):
         Wavelength in microns to evaluate
     material: str
         Name of the material to look up
+    
+    Returns
+    -------
+    k: numpy array or float
+        imaginary index of refraction
+    n: numpy array or float
+        real index of refraction
     """
     opt_data_path = 'optical_dat/{}[s].dat'.format(material)
     full_opt_data_path = pkg_resources.resource_filename('dust_mie',opt_data_path)

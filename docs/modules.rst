@@ -3,5 +3,5 @@ Modules
 
 Main Module
 ~~~~~~~~~~~~~~~~~~~
-.. autoclass:: mie_dust.mie_dust
+.. automodule:: dust_mie.calc_mie
    :members:

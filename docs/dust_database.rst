@@ -1,8 +1,8 @@
 Dust Database
 ==============
 
-Calculations are Currently Possible for the following
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Calculations are Currently Possible for the following dust particle compositions:
+
 .. literalinclude:: ../dust_mie/optical_dat/dust_dict.yaml
 
 ..   :language: yaml

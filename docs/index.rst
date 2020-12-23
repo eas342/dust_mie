@@ -11,6 +11,8 @@ The raw code is accessible at https://github.com/eas342/dust_mie
    
    installation
    
+   basic_usage
+   
    dust_database
    
 .. toctree::

@@ -32,17 +32,34 @@ labelDict = yaml.safe_load(open(dustDictFile))
 # def q_ext(x,n_i, n_r):
 #     q_out = q_absorb(x,n_i,n_r) + q_scat(x,n_r)
 #     return q_out
-    
-def q_ext_full(x,n_i, n_r):
-    x_in = np.array(x)
-    n_complex = np.array(n_r) - np.array(n_i) * 1j
-    qext, qsca, qback, g = miepython.mie(n_complex,x_in)
-    return qext
-
-#memory = Memory(cachedir='cache')
-#q_ext_mem = memory.cache(q_ext_full)
 
 def all_opt_coeff_full(x,n_i,n_r):
+    """
+    A wrapper for the miepython calc
+    
+    The absorption coefficient can be found from qext - qsca
+    
+    Parameters
+    ----------
+    x: float or numpy array
+        the size parameter 2pi r/lambda
+    n_i: float or numpy array
+        imaginary part of the index of refraction
+    n_r: float or numpy array
+        real part of the index of frefraction
+    
+    Returns
+    --------
+    qext: numpy array
+        Extinction cross section coefficient
+    qsca: numpy array
+        Scattering cross section coefficient
+    qback: numpy array
+        Back-scattering cross section coefficient
+    g: numpy array
+        the average cosine of the scattering phase function
+    
+    """
     x_in = np.array(x)
     n_complex = np.array(n_r) - np.array(n_i) * 1j
     qext, qsca, qback, g = miepython.mie(n_complex,x_in)
@@ -50,6 +67,60 @@ def all_opt_coeff_full(x,n_i,n_r):
 
 #all_opt_coeff_mem = memory.cache(all_opt_coeff_full)
 
+
+def get_index_refrac(wav,material='Fe2SiO4'):
+    """
+    Return the index of refraction for a given wavelength and material
+    
+    Parameters
+    ----------
+    wav: float or numpy array
+        Wavelength in microns to evaluate
+    material: str
+        Name of the material to look up
+    
+    Returns
+    -------
+    k: numpy array or float
+        imaginary index of refraction
+    n: numpy array or float
+        real index of refraction
+    """
+    opt_data_path = 'optical_dat/{}[s].dat'.format(material)
+    full_opt_data_path = pkg_resources.resource_filename('dust_mie',opt_data_path)
+    
+    dat = ascii.read(full_opt_data_path)
+    
+    f_k = interp1d(dat['wl(um)'],dat['k'])
+    f_n = interp1d(dat['wl(um)'],dat['n'])
+    
+    k = f_k(wav)
+    n = f_n(wav)
+    
+    return k,n
+
+def get_mie_coeff(wav,r=0.1,material='Fe2SiO4'):
+    """
+    Return the Mie coefficients for a given radius and wavelength (single particle size)
+    Assumes homogeneous spherical particles
+    
+    Parameters
+    ----------
+    wav: float or numpy array
+        Wavelength in microns to evaluate
+    r: float or numpy array
+        Radii of the particles in microns
+    material: str
+        Name of the material to look up
+    """
+    
+    x = 2. * np.pi * np.array(r)/np.array(wav)
+    
+    k, n = get_index_refrac(wav,material=material)
+    
+    qext, qsca, qback, g = all_opt_coeff_full(x, k, n)
+    
+    return qext, qsca, qback, g
 
 def reshape_dotprod(mieResult,npoint,nwav,weights):
     mieResult2D = np.reshape(mieResult,(npoint,nwav))
@@ -156,61 +227,6 @@ def lognorm(x,s,med):
     mu = np.log(med)
     y = 1. / (s* x * np.sqrt(2.*np.pi)) * np.exp(-0.5*((np.log(x)-mu)/s)**2)
     return y
-
-
-def get_index_refrac(wav,material='Fe2SiO4'):
-    """
-    Return the index of refraction for a given wavelength and material
-    
-    Parameters
-    ----------
-    wav: float or numpy array
-        Wavelength in microns to evaluate
-    material: str
-        Name of the material to look up
-    
-    Returns
-    -------
-    k: numpy array or float
-        imaginary index of refraction
-    n: numpy array or float
-        real index of refraction
-    """
-    opt_data_path = 'optical_dat/{}[s].dat'.format(material)
-    full_opt_data_path = pkg_resources.resource_filename('dust_mie',opt_data_path)
-    
-    dat = ascii.read(full_opt_data_path)
-    
-    f_k = interp1d(dat['wl(um)'],dat['k'])
-    f_n = interp1d(dat['wl(um)'],dat['n'])
-    
-    k = f_k(wav)
-    n = f_n(wav)
-    
-    return k,n
-
-def get_mie_coeff(wav,r=0.1,material='Fe2SiO4'):
-    """
-    Return the Mie coefficients for a given radius and wavelength (single particle size)
-    Assumes homogeneous spherical particles
-    
-    Parameters
-    ----------
-    wav: float or numpy array
-        Wavelength in microns to evaluate
-    r: float or numpy array
-        Radii of the particles in microns
-    material: str
-        Name of the material to look up
-    """
-    
-    x = 2. * np.pi * np.array(r)/np.array(wav)
-    
-    k, n = get_index_refrac(wav,material=material)
-    
-    qext, qsca, qback, g = all_opt_coeff_full(x, k, n)
-    
-    return qext, qsca, qback, g
 
 def plot_all(r=0.1,plotType='extinction',distribution='single'):
     compList = glob.glob('optical_data/*.dat')

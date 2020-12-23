@@ -7,4 +7,4 @@
 docs/_build/
 build/
 dist/
-mie_dust.egg-info/
+dust_mie.egg-info/

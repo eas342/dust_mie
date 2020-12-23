@@ -10,7 +10,7 @@ setup(
     version='0.1.dev1',
     author='Everett Schlawin',
     packages=['dust_mie'],
-    url="https://github.com/eas342/mie_dust",
+    url="https://github.com/eas342/dust_mie",
     description="A package to evaluate dust coefficients for a variety of compositions",
     include_package_data=True,
     install_requires=[

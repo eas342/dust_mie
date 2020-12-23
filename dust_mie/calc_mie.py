@@ -43,8 +43,8 @@ def q_ext_full(x,n_i, n_r):
     qext, qsca, qback, g = miepython.mie(n_complex,x_in)
     return qext
 
-memory = Memory(cachedir='cache')
-q_ext_mem = memory.cache(q_ext_full)
+#memory = Memory(cachedir='cache')
+#q_ext_mem = memory.cache(q_ext_full)
 
 def all_opt_coeff_full(x,n_i,n_r):
     x_in = np.array(x)
@@ -52,7 +52,7 @@ def all_opt_coeff_full(x,n_i,n_r):
     qext, qsca, qback, g = miepython.mie(n_complex,x_in)
     return qext, qsca, qback, g
 
-all_opt_coeff_mem = memory.cache(all_opt_coeff_full)
+#all_opt_coeff_mem = memory.cache(all_opt_coeff_full)
 
 
 def reshape_dotprod(mieResult,npoint,nwav,weights):
@@ -122,7 +122,7 @@ def q_ext_lognorm_full(wavel,rad=1.0,n=complex(1.825,-1e-4),logNorm=False,
         
     return finalQext, final_qscat, final_qback, final_g
 
-q_ext_lognorm = memory.cache(q_ext_lognorm_full)
+#q_ext_lognorm = memory.cache(q_ext_lognorm_full)
 
 def invLognorm(s,med,pdfThreshold):
     """ 
@@ -174,7 +174,7 @@ def get_index_refrac(wav,material='Fe2SiO4'):
         Name of the material to look up
     """
     opt_data_path = 'optical_dat/{}[s].dat'.format(material)
-    full_opt_data_path = pkg_resources.resource_filename('mie_dust',opt_data_path)
+    full_opt_data_path = pkg_resources.resource_filename('dust_mie',opt_data_path)
     
     dat = ascii.read(full_opt_data_path)
     
@@ -201,7 +201,7 @@ def get_mie_coeff(wav,r=0.1,material='Fe2SiO4'):
         Name of the material to look up
     """
     
-    x = 2. * np.pi * r/wav
+    x = 2. * np.pi * np.array(r)/np.array(wav)
     
     k, n = get_index_refrac(wav,material=material)
     

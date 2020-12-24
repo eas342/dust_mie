@@ -21,8 +21,8 @@ Or, here's how to show the extinction as a function of wavelength:
   :alt: Extinction as a function of wavelength
 
 
-Particle Size Distribution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Particle Size Distribution Evaluation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can also calculate the extinction function for a log-normal particle size distribution.
 Here, the sigma of the distribution is set to be 0.5

@@ -135,6 +135,39 @@ def get_mie_coeff(wav,r=0.1,material='Fe2SiO4'):
     
     return qext, qsca, qback, g
 
+
+def get_r_to_evaluate(r,s=0.5,pdfThreshold=0.001,npoint=128):
+    """
+    Find the radii to evaluate for a log-normal particle size distribution
+    
+    Parameters
+    ----------
+    r: float
+        The median particle radius
+    s: float
+        The sigma of the lognormal distribution
+    pdfThreshold: float
+        Threshold of the PDF to evaluate
+    npoint: int
+        Number of points to evaluate
+    
+    Returns
+    -------
+    sizeEval: numpy array
+        The radii to evaluate lognormal distribution
+    dSize: numpy array
+        The deltas in radii
+    """
+    ## Size to evaluate lognormal weights
+    ## Make a linear space from threshold to threshold in the PDF
+    lowEval, highEval = invLognorm(s,r,pdfThreshold)
+    
+    sizeEvalExtra = np.logspace(np.log(lowEval),np.log(highEval),base=np.e,num=(npoint+1))
+    sizeEval = sizeEvalExtra[0:-1] ## extra point is for differentials
+    dSize = np.diff(sizeEvalExtra)
+    
+    return sizeEval, dSize
+
 def reshape_dotprod(mieResult,npoint,nwav,weights):
     mieResult2D = np.reshape(mieResult,(npoint,nwav))
     return np.dot(weights,mieResult2D)
@@ -180,13 +213,8 @@ def get_mie_coeff_distribution(wav,r=0.1,material='Fe2SiO4',s=0.5,
     ## Generate an array of points along the distribution
     ## Size multiplier
     nwav = np.array(wav).size
-    ## Size to evaluate lognormal weights
-    ## Make a linear space from threshold to threshold in the PDF
-    lowEval, highEval = invLognorm(s,r,pdfThreshold)
     
-    sizeEvalExtra = np.logspace(np.log(lowEval),np.log(highEval),base=np.e,num=(npoint+1))
-    sizeEval = sizeEvalExtra[0:-1] ## extra point is for differentials
-    dSize = np.diff(sizeEvalExtra)
+    sizeEval, dSize = get_r_to_evaluate(r,s=r,pdfThreshold=pdfThreshold,npoint=npoint)
     
     weights = lognorm(sizeEval,s,r) * dSize
     sumWeights = np.sum(weights)
@@ -194,6 +222,7 @@ def get_mie_coeff_distribution(wav,r=0.1,material='Fe2SiO4',s=0.5,
         print(r'!!!!!!Warning, PDF weights not properly sampling PDF!!!!')
         pdb.set_trace()
     weights = weights / sumWeights
+    
     ## Arrange the array into 2D for multiplication of the grids
     sizeMult = (np.tile(sizeEval/r,(nwav,1))).transpose()
     sizeArr = np.tile(sz,(npoint,1))

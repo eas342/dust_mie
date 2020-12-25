@@ -7,5 +7,5 @@ qext, qsca, qback, g = calc_mie.get_mie_coeff_distribution(wave,r=1.0,material='
 
 plt.plot(wave,qext)
 plt.xlabel('Wavelength ($\mu$m)')
-plt.ylabel('Wavelength ($\mu$m)')
+plt.ylabel('Q$_{ext}$')
 plt.savefig('extinct_func_distribution.png')

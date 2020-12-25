@@ -34,3 +34,15 @@ Here, the sigma of the distribution is set to be 0.5
 .. image:: snippets/extinct_func_distribution.png
   :width: 400
   :alt: Extinction as a function of wavelength with lognormal distribution
+
+Plot the Particle Size Distribution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You can plot the particle size distribution for a log-normal function.
+
+.. literalinclude:: snippets/plot_r_dist.py
+
+..   :language: python
+
+.. image:: snippets/radius_distribution.png
+  :width: 400
+  :alt: Number of particles as a function of size

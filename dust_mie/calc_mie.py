@@ -214,7 +214,7 @@ def get_mie_coeff_distribution(wav,r=0.1,material='Fe2SiO4',s=0.5,
     ## Size multiplier
     nwav = np.array(wav).size
     
-    sizeEval, dSize = get_r_to_evaluate(r,s=r,pdfThreshold=pdfThreshold,npoint=npoint)
+    sizeEval, dSize = get_r_to_evaluate(r,s=s,pdfThreshold=pdfThreshold,npoint=npoint)
     
     weights = lognorm(sizeEval,s,r) * dSize
     sumWeights = np.sum(weights)

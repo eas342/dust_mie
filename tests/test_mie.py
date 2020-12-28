@@ -1,8 +1,9 @@
 from dust_mie import calc_mie
 import unittest
 import numpy as np
+import pdb
 
-class TestStringMethods(unittest.TestCase):
+class test_calcmie(unittest.TestCase):
 
     def test_eval(self):
         qext, qsca, qback, g = calc_mie.all_opt_coeff_full(10,0.1,1.8)
@@ -32,6 +33,14 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(np.allclose(res[2],7.47728246e-08,rtol=1e-4))
         self.assertTrue(np.allclose(res[3],3.06050726e-05,rtol=1e-4))
 
+    def test_negative_r_single(self):
+        with self.assertRaisesRegex(ValueError,'Negative or zero radius not allowed') as cm:
+            calc_mie.get_mie_coeff(1.0,-0.3)
+    
+    def test_negative_r_for_dist(self):
+        with self.assertRaisesRegex(ValueError,'Negative or zero radius not allowed') as cm:
+            calc_mie.get_mie_coeff_distribution(1.0,-0.3)
+    
 
 if __name__ == '__main__':
     unittest.main()

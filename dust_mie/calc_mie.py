@@ -126,6 +126,8 @@ def get_mie_coeff(wav,r=0.1,material='Fe2SiO4'):
         the average cosine of the scattering phase function
     
     """
+    if r <= 0:
+        raise ValueError("Negative or zero radius not allowed")
     
     x = 2. * np.pi * np.array(r)/np.array(wav)
     
@@ -205,8 +207,10 @@ def get_mie_coeff_distribution(wav,r=0.1,material='Fe2SiO4',s=0.5,
         the average cosine of the scattering phase function
     
     """
-
-
+    
+    if r <= 0:
+        raise ValueError('Negative or zero radius not allowed')
+    
     sz = 2. * np.pi * r/np.array(wav)
     k, n = get_index_refrac(wav,material=material)
     
@@ -219,8 +223,8 @@ def get_mie_coeff_distribution(wav,r=0.1,material='Fe2SiO4',s=0.5,
     weights = lognorm(sizeEval,s,r) * dSize
     sumWeights = np.sum(weights)
     if (sumWeights < 0.8) | (sumWeights > 1.1):
-        print(r'!!!!!!Warning, PDF weights not properly sampling PDF!!!!')
-        pdb.set_trace()
+        raise Exception('!!!!!!PDF weights not properly sampling PDF!!!!')
+    
     weights = weights / sumWeights
     
     ## Arrange the array into 2D for multiplication of the grids

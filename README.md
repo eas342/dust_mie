@@ -1,6 +1,6 @@
 `dust_mie` README
 ==========================================
-`dust_mie` Is a wrapper for the `miescatter` program to quickly calculate absorption, extinction and scattering coefficients.
+`dust_mie` Is a wrapper for the `miepython` program to quickly calculate absorption, extinction and scattering coefficients.
 It has a small database of optical coefficients.
 
 

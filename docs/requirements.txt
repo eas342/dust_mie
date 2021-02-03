@@ -7,3 +7,4 @@ sphinx-rtd-theme
 tqdm
 miepython
 joblib
+yaml

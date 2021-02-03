@@ -4,5 +4,6 @@
 It has a small database of optical coefficients.
 
 
-<!-- See the read-the-docs page for information on how to install and use `dust_mie`:
-[https://dust_mie.readthedocs.io/en/latest/](https://dust_mie.readthedocs.io/en/latest/) -->
+See the read-the-docs page for information on how to install and use `dust_mie`:
+[https://dust_mie.readthedocs.io/en/latest/](https://dust_mie.readthedocs.io/en/latest/)
+

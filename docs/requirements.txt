@@ -6,3 +6,4 @@ scipy
 sphinx-rtd-theme
 tqdm
 miepython
+joblib

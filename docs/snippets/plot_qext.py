@@ -7,5 +7,5 @@ qext, qsca, qback, g = calc_mie.get_mie_coeff(wave,r=1.0,material='SiO2')
 
 plt.plot(wave,qext)
 plt.xlabel('Wavelength ($\mu$m)')
-plt.ylabel('Wavelength ($\mu$m)')
+plt.ylabel('Extinction Coeff (Q$_{ext}$)')
 plt.savefig('extinct_func.png')

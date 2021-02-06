@@ -41,7 +41,11 @@ class test_calcmie(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'Negative or zero radius not allowed') as cm:
             calc_mie.get_mie_coeff_distribution(1.0,-0.3)
     
-
+    def test_outside_interpolation_range(self):
+        wave = np.array([1e-5,2.5])
+        qext, qsca, qback, g = calc_mie.get_mie_coeff(wave,r=1.0,material='Fe2SiO4')
+        self.assertEqual(np.isfinite(qext)[0],False)
+    
     def test_large_r(self):
         res = calc_mie.get_mie_coeff_distribution(0.8,r=1000.,material='Mg2SiO4')     
     

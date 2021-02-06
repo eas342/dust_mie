@@ -91,8 +91,8 @@ def get_index_refrac(wav,material='Fe2SiO4'):
     
     dat = ascii.read(full_opt_data_path)
     
-    f_k = interp1d(dat['wl(um)'],dat['k'])
-    f_n = interp1d(dat['wl(um)'],dat['n'])
+    f_k = interp1d(dat['wl(um)'],dat['k'],fill_value=np.nan,bounds_error=False)
+    f_n = interp1d(dat['wl(um)'],dat['n'],fill_value=np.nan,bounds_error=False)
     
     k = f_k(wav)
     n = f_n(wav)
@@ -133,7 +133,14 @@ def get_mie_coeff(wav,r=0.1,material='Fe2SiO4'):
     
     k, n = get_index_refrac(wav,material=material)
     
-    qext, qsca, qback, g = all_opt_coeff_full(x, k, n)
+    fpt = np.isfinite(k) & np.isfinite(n) ## finite points
+    
+    qext = np.zeros_like(x) * np.nan
+    qsca = np.zeros_like(x) * np.nan
+    qback = np.zeros_like(x) * np.nan
+    g = np.zeros_like(x) * np.nan
+    
+    qext[fpt], qsca[fpt], qback[fpt], g[fpt] = all_opt_coeff_full(x[fpt], k[fpt], n[fpt])
     
     return qext, qsca, qback, g
 

@@ -46,6 +46,13 @@ class test_calcmie(unittest.TestCase):
         qext, qsca, qback, g = calc_mie.get_mie_coeff(wave,r=1.0,material='Fe2SiO4')
         self.assertEqual(np.isfinite(qext)[0],False)
     
+    def test_specific_wave(self):
+        """ This one failed for a weird error:
+        UnboundLocalError: local variable 'mm' referenced before assignment
+        """
+        wave = np.array([0.1,0.2])
+        qext, qsca, qback, g = calc_mie.get_mie_coeff(wave,r=1.0,material='Fe2SiO4')
+    
     def test_large_r(self):
         res = calc_mie.get_mie_coeff_distribution(0.8,r=1000.,material='Mg2SiO4')     
     

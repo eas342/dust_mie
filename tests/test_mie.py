@@ -64,7 +64,7 @@ class test_calcmie(unittest.TestCase):
         res = calc_mie.get_mie_coeff_distribution(0.8,r=1000.,material='Mg2SiO4')     
     
     def test_specific_r(self):
-        res = calc_mie.get_mie_coeff_distribution(0.8,r=342.35,material='Mg2SiO4')    
+        res = calc_mie.get_mie_coeff_distribution(0.8,r=342.35,material='Mg2SiO4',pdfThreshold=1e-4)
 
 if __name__ == '__main__':
     unittest.main()

@@ -252,7 +252,9 @@ def get_mie_coeff_distribution(wav,r=0.1,material='Fe2SiO4',s=0.5,
     weights = lognorm(sizeEval,s,r) * dSize
     sumWeights = np.sum(weights)
     if (sumWeights < 0.8) | (sumWeights > 1.1):
-        raise Exception('!!!!!!PDF weights not properly sampling PDF for r={},s={}!!!!'.format(r,s))
+        txt1 = '!!!!!!PDF weights not properly sampling PDF for r={},s={}!!!'.format(r,s)
+        txt2 = 'Try decreasing pdfThreshold by an order of magnitude.'
+        raise Exception(txt1 + txt2)
     
     weights = weights / sumWeights
     

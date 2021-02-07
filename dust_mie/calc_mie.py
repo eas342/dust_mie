@@ -46,7 +46,7 @@ def all_opt_coeff_full(x,n_i,n_r):
     n_i: float or numpy array
         imaginary part of the index of refraction
     n_r: float or numpy array
-        real part of the index of frefraction
+        real part of the index of refraction
     
     Returns
     --------
@@ -63,15 +63,25 @@ def all_opt_coeff_full(x,n_i,n_r):
     x_in = np.array(x)
     n_complex = np.array(n_r) - np.array(n_i) * 1j
     
+    ## make sure they are the same length
+    full_length = np.max([np.size(x_in),np.size(n_complex)])
+    x_in = x_in * np.ones(full_length)
+    n_complex = n_complex * np.ones(full_length)
+    
     ## Work only with wavelengths where index of refr. is finite
     fpt = np.isfinite(n_complex) ## finite points
+    nft = fpt == False ## non-finite points
+    nan1 = np.array([np.nan])
     
-    qext = np.zeros_like(x_in) * np.nan
-    qsca = np.zeros_like(x_in) * np.nan
-    qback = np.zeros_like(x_in) * np.nan
-    g = np.zeros_like(x_in) * np.nan
-        
+    qext = np.zeros_like(x_in)
+    qsca = np.zeros_like(x_in)
+    qback = np.zeros_like(x_in)
+    g = np.zeros_like(x_in)
+    
     qext[fpt], qsca[fpt], qback[fpt], g[fpt] = miepython.mie(n_complex[fpt],x_in[fpt])
+    ## make the non-finite indices of refraction get non-finite coefficients
+    qext[nft], qsca[nft], qext[nft], g[nft] = nan1, nan1, nan1, nan1
+    
     
     return qext, qsca, qback, g
 

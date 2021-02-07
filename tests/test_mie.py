@@ -42,8 +42,15 @@ class test_calcmie(unittest.TestCase):
             calc_mie.get_mie_coeff_distribution(1.0,-0.3)
     
     def test_outside_interpolation_range(self):
+        """ Test single particle evaluation outside interpolation range"""
         wave = np.array([1e-5,2.5])
         qext, qsca, qback, g = calc_mie.get_mie_coeff(wave,r=1.0,material='Fe2SiO4')
+        self.assertEqual(np.isfinite(qext)[0],False)
+    
+    def test_outside_interpolation_range_distribution(self):
+        """ Test distribution of particle sizes evaluation outside interpolation range"""
+        wave = np.array([1e-5,2.5])
+        qext, qsca, qback, g = calc_mie.get_mie_coeff_distribution(wave,r=1.0,material='Fe2SiO4')
         self.assertEqual(np.isfinite(qext)[0],False)
     
     def test_specific_wave(self):

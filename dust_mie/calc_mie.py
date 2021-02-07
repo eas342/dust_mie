@@ -62,7 +62,17 @@ def all_opt_coeff_full(x,n_i,n_r):
     """
     x_in = np.array(x)
     n_complex = np.array(n_r) - np.array(n_i) * 1j
-    qext, qsca, qback, g = miepython.mie(n_complex,x_in)
+    
+    ## Work only with wavelengths where index of refr. is finite
+    fpt = np.isfinite(n_complex) ## finite points
+    
+    qext = np.zeros_like(x_in) * np.nan
+    qsca = np.zeros_like(x_in) * np.nan
+    qback = np.zeros_like(x_in) * np.nan
+    g = np.zeros_like(x_in) * np.nan
+        
+    qext[fpt], qsca[fpt], qback[fpt], g[fpt] = miepython.mie(n_complex[fpt],x_in[fpt])
+    
     return qext, qsca, qback, g
 
 #all_opt_coeff_mem = memory.cache(all_opt_coeff_full)
@@ -133,14 +143,7 @@ def get_mie_coeff(wav,r=0.1,material='Fe2SiO4'):
     
     k, n = get_index_refrac(wav,material=material)
     
-    fpt = np.isfinite(k) & np.isfinite(n) ## finite points
-    
-    qext = np.zeros_like(x) * np.nan
-    qsca = np.zeros_like(x) * np.nan
-    qback = np.zeros_like(x) * np.nan
-    g = np.zeros_like(x) * np.nan
-    
-    qext[fpt], qsca[fpt], qback[fpt], g[fpt] = all_opt_coeff_full(x[fpt], k[fpt], n[fpt])
+    qext, qsca, qback, g = all_opt_coeff_full(x,k,n)
     
     return qext, qsca, qback, g
 

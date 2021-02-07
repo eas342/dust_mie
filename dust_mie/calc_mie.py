@@ -12,7 +12,7 @@ from astropy.table import Table
 from scipy.interpolate import interp1d
 import pkg_resources
 import yaml
-
+import warnings
 
 dustDictFile = pkg_resources.resource_filename('dust_mie','optical_dat/dust_dict.yaml')
 labelDict = yaml.safe_load(open(dustDictFile))
@@ -68,8 +68,16 @@ def all_opt_coeff_full(x,n_i,n_r):
     x_in = x_in * np.ones(full_length)
     n_complex = n_complex * np.ones(full_length)
     
+    ## Make all points with sz > 100. the same as 100
+    ## Otherwise the miescatter code quits without any warning or diagnostics, or gets NaN
+    maxR = 100.
+    highp = x_in > maxR
+    if np.sum(highp) >= 1:
+        warnings.warn('Setting values above {} to {} for miepython'.format(maxR,maxR))
+        x_in[highp] = maxR
+    
     ## Work only with wavelengths where index of refr. is finite
-    fpt = np.isfinite(n_complex) ## finite points
+    fpt = (np.isfinite(n_complex) & np.isfinite(x_in)) ## finite points
     nft = fpt == False ## non-finite points
     nan1 = np.array([np.nan])
     
@@ -78,7 +86,8 @@ def all_opt_coeff_full(x,n_i,n_r):
     qback = np.zeros_like(x_in)
     g = np.zeros_like(x_in)
     
-    qext[fpt], qsca[fpt], qback[fpt], g[fpt] = miepython.mie(n_complex[fpt],x_in[fpt])
+    if np.sum(fpt) >= 1:
+        qext[fpt], qsca[fpt], qback[fpt], g[fpt] = miepython.mie(n_complex[fpt],x_in[fpt])
     ## make the non-finite indices of refraction get non-finite coefficients
     qext[nft], qsca[nft], qext[nft], g[nft] = nan1, nan1, nan1, nan1
     
@@ -258,11 +267,6 @@ def get_mie_coeff_distribution(wav,r=0.1,material='Fe2SiO4',s=0.5,
     final_n = n_2d.ravel()
     k_2d = np.tile(k,(npoint,1))
     final_k = k_2d.ravel()
-    
-    ## Make all points with sz > 100. the same as 100
-    ## Otherwise the miescatter code quits without any warning or diagnostics
-    highp = x > 100.
-    x[highp] = 100.
     
     qext, qsca, qback, g = all_opt_coeff_full(x, final_k, final_n)
     

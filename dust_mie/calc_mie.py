@@ -87,7 +87,13 @@ def all_opt_coeff_full(x,n_i,n_r):
     g = np.zeros_like(x_in)
     
     if np.sum(fpt) >= 1:
-        qext[fpt], qsca[fpt], qback[fpt], g[fpt] = miepython.mie(n_complex[fpt],x_in[fpt])
+        if miepython.__version__ >= "3":
+            ## new function, x is 2pi * r/lambda so divide by pi to get diameter
+            eval_result = miepython.efficiencies(n_complex[fpt],x_in[fpt]/np.pi,1.0)
+        else:
+            ## old function, evaluate the x
+            eval_result = miepython.mie(n_complex[fpt],x_in[fpt])
+        qext[fpt], qsca[fpt], qback[fpt], g[fpt] = eval_result
     ## make the non-finite indices of refraction get non-finite coefficients
     qext[nft], qsca[nft], qext[nft], g[nft] = nan1, nan1, nan1, nan1
     

@@ -382,13 +382,13 @@ def plot_all(r=0.1,plotType='extinction',distribution='single'):
     
     ax.set_xlim(0., 13.)
 
-    ax.set_xlabel("Wavelength ($\mu$m)")
+    ax.set_xlabel(r"Wavelength ($\mu$m)")
     
 
     if distribution == 'single':
-        thisTitle = "Single-radius R={} $\mu$m ".format(r)
+        thisTitle = r"Single-radius R={} $\mu$m ".format(r)
     else:
-        thisTitle = "Log-Normal R={} $\mu$m ".format(r)
+        thisTitle = r"Log-Normal R={} $\mu$m ".format(r)
     
     ax.set_title(thisTitle)
     
